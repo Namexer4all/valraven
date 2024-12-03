@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VALRAVEN</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0f1923;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(135deg, rgba(255, 70, 85, 0.1) 0%, transparent 100%),
+                linear-gradient(45deg, rgba(15, 25, 35, 0.9) 0%, rgba(15, 25, 35, 0.7) 100%),
+                url('https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/blt29d528075e2f3053/5eb26f54402b8b4d13a56656/agent-background-generic.JPG');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: -2;
+            animation: backgroundPulse 8s ease-in-out infinite;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 50% 50%, rgba(255, 70, 85, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 70, 85, 0.1) 0%, transparent 30%);
+            animation: particlesMove 20s linear infinite;
+        }
+
+        @keyframes backgroundPulse {
+            0%, 100% {
+                filter: brightness(0.8);
+            }
+            50% {
+                filter: brightness(1);
+            }
+        }
+
+        @keyframes particlesMove {
+            0% {
+                transform: translate(0, 0);
+            }
+            100% {
+                transform: translate(-100px, -100px);
+            }
+        }
+
+        .background-video {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -1;
+            filter: brightness(0.4);
+            opacity: 0.4;
+        }
+
+        .nav {
+            position: fixed;
+            top: 0;
+            right: 0;
+            padding: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .nav-button {
+            background: transparent;
+            color: #ff4655;
+            border: 1px solid #ff4655;
+            padding: 10px 20px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-button:hover {
+            background: #ff4655;
+            color: white;
+        }
+
+        .nav-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                120deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        .nav-button:hover::before {
+            left: 100%;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .title {
+            font-size: 4em;
+            color: #ff4655;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255, 70, 85, 0.8),
+                         0 0 40px rgba(255, 70, 85, 0.4);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px rgba(255, 70, 85, 0.5);
+            }
+            to {
+                text-shadow: 0 0 20px rgba(255, 70, 85, 0.8);
+            }
+        }
+
+        .subtitle {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .status {
+            color: #00ff00;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+
+        .download-btn {
+            background: linear-gradient(45deg, #ff4655, #ff6b76);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 70, 85, 0.5);
+        }
+
+        .note {
+            color: #ff4655;
+            font-size: 1em;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(255, 70, 85, 0.3);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #1f2933 0%, #0f1923 100%);
+            padding: 30px;
+            border-radius: 5px;
+            width: 300px;
+            border: 1px solid rgba(255, 70, 85, 0.3);
+            box-shadow: 0 0 20px rgba(255, 70, 85, 0.2);
+        }
+
+        .modal input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background: #0f1923;
+            border: 1px solid #ff4655;
+            color: white;
+        }
+
+        .modal button {
+            width: 100%;
+            padding: 10px;
+            background: #ff4655;
+            color: white;
+            border: none;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .close {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .error-message {
+            color: #ff4655;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Video -->
+    <video autoplay muted loop class="background-video">
+        <source src="https://assets.contentstack.io/v3/assets/bltb6530b271fddd0b1/blt714eaee50b90fc27/62cc7dcc6a8fb133b0ff7e55/VALORANT_ANNO22_SHATTERED_16x9_27s.mp4" type="video/mp4">
+    </video>
+
+    <!-- Particles Effect -->
+    <div class="particles"></div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <button class="nav-button" onclick="showModal('loginModal')">Login</button>
+        <button class="nav-button" onclick="showModal('registerModal')">Register</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <h1 class="title">VALRAVEN</h1>
+        <p class="subtitle">VALORANT SKIN CHANGER PRO</p>
+        <p class="status">UNDETECTED (Still Works) Creation Date 10/10/24</p>
+        <button class="download-btn" id="download-button" disabled>DOWNLOAD - FREE</button>
+        <p class="note">* You need to log in to download Download Button Works If Only You Login!</p>
+        <p class="note">* Note: If You Dont Have An Account You Must Register Then Login!
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideModal('loginModal')">&times;</span>
+            <h2>Login</h2>
+            <form id="login-form">
+                <input type="text" id="login-username" placeholder="Username" required>
+                <input type="password" id="login-password" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+            <p id="login-message" class="error-message"></p>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideModal('registerModal')">&times;</span>
+            <h2>Register</h2>
+            <form id="register-form">
+                <input type="text" id="register-username" placeholder="Username" required>
+                <input type="password" id="register-password" placeholder="Password" required>
+                <button type="submit">Register</button>
+            </form>
+            <p id="register-message" class="error-message"></p>
+        </div>
+    </div>
+
+    <script>
+        // Initialize users array with some default users
+        let users = [
+            { username: 'admin', password: 'admin123' },
+            { username: 'test', password: 'test123' }
+        ];
+
+        // Load users from localStorage if available
+        if (localStorage.getItem('users')) {
+            users = JSON.parse(localStorage.getItem('users'));
+        }
+
+        let isLoggedIn = false;
+
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+            // Clear any previous messages
+            document.getElementById('login-message').textContent = '';
+            document.getElementById('register-message').textContent = '';
+        }
+
+        function hideModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            // Clear form inputs
+            if (modalId === 'loginModal') {
+                document.getElementById('login-form').reset();
+            } else {
+                document.getElementById('register-form').reset();
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.className === 'modal') {
+                event.target.style.display = 'none';
+            }
+        }
+
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+
+            const user = users.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                isLoggedIn = true;
+                document.getElementById('login-message').style.color = 'green';
+                document.getElementById('login-message').textContent = 'Login successful!';
+                document.getElementById('download-button').disabled = false;
+                setTimeout(() => hideModal('loginModal'), 1500);
+            } else {
+                document.getElementById('login-message').textContent = 'Invalid username or password!';
+            }
+        });
+
+        document.getElementById('register-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const username = document.getElementById('register-username').value;
+            const password = document.getElementById('register-password').value;
+
+            if (username.length < 3) {
+                document.getElementById('register-message').textContent = 'Username must be at least 3 characters long!';
+                return;
+            }
+
+            if (password.length < 6) {
+                document.getElementById('register-message').textContent = 'Password must be at least 6 characters long!';
+                return;
+            }
+
+            const userExists = users.some(u => u.username === username);
+            
+            if (userExists) {
+                document.getElementById('register-message').textContent = 'Username already exists!';
+            } else {
+                users.push({ username, password });
+                localStorage.setItem('users', JSON.stringify(users));
+                document.getElementById('register-message').style.color = 'green';
+                document.getElementById('register-message').textContent = 'Registration successful!';
+                setTimeout(() => hideModal('registerModal'), 1500);
+            }
+        });
+
+        document.getElementById('download-button').addEventListener('click', function() {
+            if (!isLoggedIn) {
+                alert('Please login first!');
+                showModal('loginModal');
+                return;
+            }
+            window.location.href = 'https://download946.mediafire.com/7bopibk5cvag70jxUuaKERAZtY18aTlP-ieTgnBECQmZwmR9YGvV0WwOyi7qzpEQK4Ad9lFs2g0DTzPo2ezKfYWC5y-F6YGOmk0o0rviC6fC_v7m0ohUbhgtb3i7dvEo7Mrx0jdpG9clm0AQYEPzJVRl_B7HzN9qvQfxKp_77MkJ/041fc55epus0gw3/Senex-valo-unlock-all.rar';
+        });
+    </script>
+</body>
+</html>
